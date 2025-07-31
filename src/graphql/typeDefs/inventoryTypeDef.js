@@ -18,9 +18,13 @@ const inventoryTypeDef = gql`
   }
 
   type Query {
+    inventories : [Inventory]!
     inventory(productId: ID!): Inventory
   }
-  
+
+  type Mutation {
+    createInventory(productId: ID!, input: InventoryInput!): Inventory!
+  }
 `;
 
 export default inventoryTypeDef;
