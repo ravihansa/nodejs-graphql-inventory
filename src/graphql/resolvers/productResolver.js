@@ -66,6 +66,60 @@ const productResolver = {
                 });
             }
         },
+
+        updateProduct: async (_, { id, input }) => {
+            try {
+                const product = await Product.findByIdAndUpdate(
+                    id,
+                    { $set: input },
+                    { new: true, runValidators: true }
+                );
+
+                if (!product) {
+                    throw new GraphQLError('Product not found', {
+                        extensions: {
+                            code: 'NOT_FOUND',
+                        },
+                    });
+                }
+                return product;
+            } catch (err) {
+                if (err instanceof GraphQLError) throw err;
+                throw new GraphQLError('Failed to update product', {
+                    extensions: {
+                        code: 'DATABASE_ERROR',
+                        details: err.message,
+                    },
+                });
+            }
+        },
+
+        deleteProduct: async (_, { id }) => {
+            try {
+                const product = await Product.findByIdAndUpdate(
+                    id,
+                    { $set: { isActive: false } },
+                    { new: true }
+                );
+
+                if (!product) {
+                    throw new GraphQLError('Product not found', {
+                        extensions: {
+                            code: 'NOT_FOUND',
+                        },
+                    });
+                }
+                return true;
+            } catch (err) {
+                if (err instanceof GraphQLError) throw err;
+                throw new GraphQLError('Failed to delete product', {
+                    extensions: {
+                        code: 'DATABASE_ERROR',
+                        details: err.message,
+                    },
+                });
+            }
+        },
     },
 
     Product: {
