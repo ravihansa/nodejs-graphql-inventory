@@ -1,6 +1,6 @@
 import Product from '../../models/Product.js';
 import Inventory from '../../models/Inventory.js';
-import { GraphQLError } from 'graphql';
+import AppError from '../../utils/AppError.js';
 
 const productResolver = {
     Query: {
@@ -8,11 +8,8 @@ const productResolver = {
             try {
                 return await Product.find();
             } catch (err) {
-                throw new GraphQLError('Failed to fetch products', {
-                    extensions: {
-                        code: 'DATABASE_ERROR',
-                        details: err.message,
-                    },
+                throw new AppError('Failed to fetch products', 'DATABASE_ERROR', {
+                    details: err.message,
                 });
             }
         },
@@ -24,17 +21,11 @@ const productResolver = {
                 } else if (prodId) {
                     return await Product.findOne({ prodId });
                 }
-                throw new GraphQLError('Must provide either id or prodId', {
-                    extensions: {
-                        code: 'BAD_USER_INPUT',
-                    },
-                });
+                throw new AppError('Must provide either id or prodId', 'BAD_USER_INPUT');
             } catch (err) {
-                throw new GraphQLError('Failed to fetch products', {
-                    extensions: {
-                        code: 'DATABASE_ERROR',
-                        details: err.message,
-                    },
+                if (err instanceof AppError) throw err;
+                throw new AppError('Failed to fetch product', 'DATABASE_ERROR', {
+                    details: err.message,
                 });
             }
         },
@@ -46,23 +37,16 @@ const productResolver = {
             try {
                 const existingProduct = await Product.findOne({ prodId: input.prodId });
                 if (existingProduct) {
-                    throw new GraphQLError('ProdId already exists', {
-                        extensions: {
-                            code: 'DUPLICATE_ID',
-                        },
-                    });
+                    throw new AppError('ProdId already exists', 'DUPLICATE_ID');
                 }
 
                 const product = new Product(input);
                 await product.save();
                 return product;
             } catch (err) {
-                if (err instanceof GraphQLError) throw err;
-                throw new GraphQLError('Failed to create product', {
-                    extensions: {
-                        code: 'DATABASE_ERROR',
-                        details: err.message,
-                    },
+                if (err instanceof AppError) throw err;
+                throw new AppError('Failed to create product', 'DATABASE_ERROR', {
+                    details: err.message,
                 });
             }
         },
@@ -76,20 +60,13 @@ const productResolver = {
                 );
 
                 if (!product) {
-                    throw new GraphQLError('Product not found', {
-                        extensions: {
-                            code: 'NOT_FOUND',
-                        },
-                    });
+                    throw new AppError('Product not found', 'NOT_FOUND');
                 }
                 return product;
             } catch (err) {
-                if (err instanceof GraphQLError) throw err;
-                throw new GraphQLError('Failed to update product', {
-                    extensions: {
-                        code: 'DATABASE_ERROR',
-                        details: err.message,
-                    },
+                if (err instanceof AppError) throw err;
+                throw new AppError('Failed to update product', 'DATABASE_ERROR', {
+                    details: err.message,
                 });
             }
         },
@@ -103,20 +80,13 @@ const productResolver = {
                 );
 
                 if (!product) {
-                    throw new GraphQLError('Product not found', {
-                        extensions: {
-                            code: 'NOT_FOUND',
-                        },
-                    });
+                    throw new AppError('Product not found', 'NOT_FOUND');
                 }
                 return true;
             } catch (err) {
-                if (err instanceof GraphQLError) throw err;
-                throw new GraphQLError('Failed to delete product', {
-                    extensions: {
-                        code: 'DATABASE_ERROR',
-                        details: err.message,
-                    },
+                if (err instanceof AppError) throw err;
+                throw new AppError('Failed to delete product', 'DATABASE_ERROR', {
+                    details: err.message,
                 });
             }
         },
