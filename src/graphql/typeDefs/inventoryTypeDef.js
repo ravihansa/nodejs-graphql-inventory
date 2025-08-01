@@ -17,13 +17,20 @@ const inventoryTypeDef = gql`
     status: Boolean
   }
 
+  input UpdateInventoryInput {
+    quantity: Int!
+    status: Boolean
+  }
+
   type Query {
     inventories : [Inventory]!
     inventory(productId: ID!): Inventory
   }
 
   type Mutation {
-    createInventory(productId: ID!, input: InventoryInput!): Inventory!
+    createInventory(input: InventoryInput!): Inventory!
+    updateInventory(id: ID!, input: UpdateInventoryInput!): Inventory!
+    adjustInventory(id: ID!, quantity: Int!): Inventory!
   }
 `;
 

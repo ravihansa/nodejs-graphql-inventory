@@ -32,9 +32,9 @@ const inventoryResolver = {
     },
 
     Mutation: {
-        createInventory: async (_, { productId, input }) => {
+        createInventory: async (_, { input }) => {
             try {
-                const product = await Product.findById(productId);
+                const product = await Product.findById(input.productId);
                 if (!product) {
                     throw new AppError('Product not found', 'NOT_FOUND');
                 }
@@ -49,6 +49,50 @@ const inventoryResolver = {
             } catch (err) {
                 if (err instanceof AppError) throw err;
                 throw new AppError('Failed to create inventory', 'DATABASE_ERROR', {
+                    details: err.message,
+                });
+            }
+        },
+
+        updateInventory: async (_, { id, input }) => {
+            try {
+                const inventory = await Inventory.findByIdAndUpdate(
+                    id,
+                    { $set: input },
+                    { new: true, runValidators: true }
+                );
+
+                if (!inventory) {
+                    throw new AppError('Inventory record not found', 'NOT_FOUND');
+                }
+                return inventory;
+            } catch (err) {
+                if (err instanceof AppError) throw err;
+                throw new AppError('Failed to update inventory', 'DATABASE_ERROR', {
+                    details: err.message,
+                });
+            }
+        },
+
+        adjustInventory: async (_, { id, quantity }) => {
+            try {
+                const inventory = await Inventory.findByIdAndUpdate(
+                    id,
+                    { $inc: { quantity } },
+                    { new: true }
+                );
+
+                if (!inventory) {
+                    throw new AppError('Inventory record not found', 'NOT_FOUND');
+                }
+
+                // Update the status based on new quantity
+                inventory.status = inventory.quantity > 0;
+                await inventory.save();
+                return inventory;
+            } catch (err) {
+                if (err instanceof AppError) throw err;
+                throw new AppError('Failed to adjust the inventory', 'DATABASE_ERROR', {
                     details: err.message,
                 });
             }
