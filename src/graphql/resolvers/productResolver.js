@@ -1,6 +1,8 @@
 import Product from '../../models/Product.js';
 import Inventory from '../../models/Inventory.js';
 import AppError from '../../utils/AppError.js';
+import exceptionFilter from '../../utils/exceptionFilter.js';
+import { createProductSchema, updateProductSchema } from '../../utils/validators/productValidator.js';
 
 const productResolver = {
     Query: {
@@ -8,9 +10,7 @@ const productResolver = {
             try {
                 return await Product.find();
             } catch (err) {
-                throw new AppError('Failed to fetch products', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to fetch products', 'DATABASE_ERROR');
             }
         },
 
@@ -23,10 +23,7 @@ const productResolver = {
                 }
                 throw new AppError('Must provide either id or prodId', 'BAD_USER_INPUT');
             } catch (err) {
-                if (err instanceof AppError) throw err;
-                throw new AppError('Failed to fetch product', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to fetch product', 'DATABASE_ERROR');
             }
         },
 
@@ -35,6 +32,7 @@ const productResolver = {
     Mutation: {
         createProduct: async (_, { input }) => {
             try {
+                createProductSchema.parse(input);
                 const existingProduct = await Product.findOne({ prodId: input.prodId });
                 if (existingProduct) {
                     throw new AppError('ProdId already exists', 'DUPLICATE_ID');
@@ -44,15 +42,13 @@ const productResolver = {
                 await product.save();
                 return product;
             } catch (err) {
-                if (err instanceof AppError) throw err;
-                throw new AppError('Failed to create product', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to create product', 'DATABASE_ERROR');
             }
         },
 
         updateProduct: async (_, { id, input }) => {
             try {
+                updateProductSchema.parse(input);
                 const product = await Product.findByIdAndUpdate(
                     id,
                     { $set: input },
@@ -64,10 +60,7 @@ const productResolver = {
                 }
                 return product;
             } catch (err) {
-                if (err instanceof AppError) throw err;
-                throw new AppError('Failed to update product', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to update product', 'DATABASE_ERROR');
             }
         },
 
@@ -84,10 +77,7 @@ const productResolver = {
                 }
                 return true;
             } catch (err) {
-                if (err instanceof AppError) throw err;
-                throw new AppError('Failed to delete product', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to delete product', 'DATABASE_ERROR');
             }
         },
     },

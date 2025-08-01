@@ -1,6 +1,7 @@
 import Product from '../../models/Product.js';
 import Inventory from '../../models/Inventory.js';
 import AppError from '../../utils/AppError.js';
+import exceptionFilter from '../../utils/exceptionFilter.js';
 
 const inventoryResolver = {
 
@@ -9,9 +10,7 @@ const inventoryResolver = {
             try {
                 return await Inventory.find();
             } catch (err) {
-                throw new AppError('Failed to fetch inventories', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to fetch inventories', 'DATABASE_ERROR');
             }
         },
 
@@ -22,10 +21,7 @@ const inventoryResolver = {
                 }
                 throw new AppError('Must provide productId', 'BAD_USER_INPUT');
             } catch (err) {
-                if (err instanceof AppError) throw err;
-                throw new AppError('Failed to fetch inventory', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to fetch inventory', 'DATABASE_ERROR');
             }
         },
 
@@ -47,10 +43,7 @@ const inventoryResolver = {
                 await newInventory.save();
                 return newInventory;
             } catch (err) {
-                if (err instanceof AppError) throw err;
-                throw new AppError('Failed to create inventory', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to create inventory', 'DATABASE_ERROR');
             }
         },
 
@@ -67,10 +60,7 @@ const inventoryResolver = {
                 }
                 return inventory;
             } catch (err) {
-                if (err instanceof AppError) throw err;
-                throw new AppError('Failed to update inventory', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to update inventory', 'DATABASE_ERROR');
             }
         },
 
@@ -91,10 +81,7 @@ const inventoryResolver = {
                 await inventory.save();
                 return inventory;
             } catch (err) {
-                if (err instanceof AppError) throw err;
-                throw new AppError('Failed to adjust the inventory', 'DATABASE_ERROR', {
-                    details: err.message,
-                });
+                exceptionFilter(err, 'Failed to adjust the inventory', 'DATABASE_ERROR');
             }
         },
     },

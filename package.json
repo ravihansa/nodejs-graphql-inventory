@@ -19,6 +19,7 @@
     "express": "^4.21.2",
     "graphql": "^16.11.0",
     "graphql-tag": "^2.12.6",
-    "mongoose": "^8.16.5"
+    "mongoose": "^8.16.5",
+    "zod": "^4.0.14"
   }
 }
