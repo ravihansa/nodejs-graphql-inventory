@@ -1,10 +1,11 @@
 import 'dotenv/config';
+import cors from 'cors';
 import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express4';
-import cors from 'cors';
 import connectDB from './src/config/db.js';
 import { typeDefs, resolvers } from './src/graphql/index.js';
+import { morganMiddleware } from './src/utils/morganLogger.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -24,10 +25,11 @@ async function startServer() {
     });
 
     await server.start();
+    app.use(express.json());
+    app.use(morganMiddleware);
     app.use(
         '/graphql',
         cors(),
-        express.json(),
         expressMiddleware(server)
     );
 

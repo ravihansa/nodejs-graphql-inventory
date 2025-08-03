@@ -6,7 +6,7 @@ const fileTransport = new DailyRotateFile({
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '10m',
-    maxFiles: '14d',
+    maxFiles: '1d',
     level: 'info',
 });
 
@@ -15,7 +15,7 @@ const errorFileTransport = new DailyRotateFile({
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '5m',
-    maxFiles: '30d',
+    maxFiles: '1d',
     level: 'error',
 });
 
