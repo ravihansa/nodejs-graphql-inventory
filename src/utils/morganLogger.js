@@ -9,8 +9,13 @@ morgan.token('graphql-query', (req) => {
         if (operation === 'IntrospectionQuery') {
             return 'Introspection Query';
         }
-        const reqQueryJson = graphQlQueryToJson(req.body.query);
-        return `| Operation: ${operation} | Query: ${JSON.stringify(reqQueryJson)}`;
+        try {
+            const reqQueryJson = graphQlQueryToJson(req.body.query);
+            return `| Operation: ${operation} | Query: ${JSON.stringify(reqQueryJson)}`;
+        } catch (error) {
+            console.info(error.message);
+            return `| Operation: ${operation} | Query: ${JSON.stringify(req.body.query)}`;
+        }
     }
     return '';
 });
