@@ -2,7 +2,7 @@ import Product from '../../models/Product.js';
 import Inventory from '../../models/Inventory.js';
 import AppError from '../../utils/AppError.js';
 import exceptionFilter from '../../utils/exceptionFilter.js';
-import { createProductSchema, updateProductSchema } from '../../utils/validators/productValidator.js';
+import { createProductSchema, updateProductSchema } from './productValidator.js';
 
 const productResolver = {
     Query: {
