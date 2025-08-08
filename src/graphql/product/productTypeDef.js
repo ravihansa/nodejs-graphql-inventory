@@ -12,6 +12,7 @@ const productTypeDef = gql`
     createdAt: String!
     updatedAt: String!
     inventory: Inventory
+    category: Category
   }
 
   input ProductInput {
@@ -20,7 +21,8 @@ const productTypeDef = gql`
     description: String
     brand: String
     price: Float!
-    isActive: Boolean
+    isActive: Boolean,
+    categoryId: ID!
   }
 
    input UpdateProductInput {
@@ -30,6 +32,7 @@ const productTypeDef = gql`
     brand: String
     price: Float
     isActive: Boolean
+    categoryId: ID
   }
 
   type Query {

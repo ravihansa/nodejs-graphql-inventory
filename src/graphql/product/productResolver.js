@@ -1,4 +1,5 @@
 import Product from '../../models/Product.js';
+import Category from '../../models/Category.js';
 import Inventory from '../../models/Inventory.js';
 import AppError from '../../utils/AppError.js';
 import exceptionFilter from '../../utils/exceptionFilter.js';
@@ -37,8 +38,13 @@ const productResolver = {
                 if (existingProduct) {
                     throw new AppError('ProdId already exists', 'DUPLICATE_ID');
                 }
+                const { categoryId, ...productObj } = input;
+                const existingCategory = await Category.findOne({ _id: categoryId });
+                if (!existingCategory) {
+                    throw new AppError('Category not found', 'NOT_FOUND');
+                }
 
-                const product = new Product(input);
+                const product = new Product({ ...productObj, category: categoryId });
                 await product.save();
                 return product;
             } catch (err) {
@@ -49,6 +55,14 @@ const productResolver = {
         updateProduct: async (_, { id, input }) => {
             try {
                 updateProductSchema.parse(input);
+                if (input.categoryId) {
+                    const { categoryId, ...productObj } = input;
+                    const existingCategory = await Category.findOne({ _id: categoryId });
+                    if (!existingCategory) {
+                        throw new AppError('Category not found', 'NOT_FOUND');
+                    }
+                    input = { ...productObj, category: categoryId };
+                }
                 const product = await Product.findByIdAndUpdate(
                     id,
                     { $set: input },
@@ -85,6 +99,9 @@ const productResolver = {
     Product: {
         inventory: async (parent) => {
             return await Inventory.findOne({ productId: parent._id });
+        },
+        category: async (parent) => {
+            return await Category.findOne({ _id: parent.category });
         }
     }
 };
