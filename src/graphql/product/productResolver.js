@@ -28,6 +28,14 @@ const productResolver = {
             }
         },
 
+        productsByName: async (_, { name }) => {
+            try {
+                return await Product.find({ name: new RegExp(name, 'i') });
+            } catch (err) {
+                exceptionFilter(err, 'Failed to fetch products', 'DATABASE_ERROR');
+            }
+        },
+
     },
 
     Mutation: {
